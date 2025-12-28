@@ -2,25 +2,26 @@ const DEFAULT_STREAM_URL = 'https://radio3.radio-calico.com:8443/calico.mp3';
 const STORAGE_KEY = 'radiocalico_last_url';
 const BUFFERING_TIMEOUT = 10000; // 10 seconds
 
-const audio = document.getElementById('audioPlayer');
-const statusDiv = document.getElementById('status');
-const loadBtn = document.getElementById('loadBtn');
-const reconnectBtn = document.getElementById('reconnectBtn');
-const debugToggleBtn = document.getElementById('debugToggleBtn');
-const urlToggleBtn = document.getElementById('urlToggleBtn');
-const urlInputContainer = document.getElementById('urlInputContainer');
-const urlInput = document.getElementById('urlInput');
-const debugPanel = document.getElementById('debugPanel');
-const debugContent = document.getElementById('debugContent');
-const liveBadge = document.getElementById('liveBadge');
-const nowPlayingInfo = document.getElementById('nowPlayingInfo');
-const songHistory = document.getElementById('songHistory');
-const albumArt = document.getElementById('albumArt');
-const playPauseButton = document.getElementById('playPauseButton');
-const playIcon = document.getElementById('playIcon');
-const pauseIcon = document.getElementById('pauseIcon');
-const volumeSlider2 = document.getElementById('volumeSlider2');
-const volumeButton = document.getElementById('volumeButton');
+// Only access DOM elements in browser environment
+const audio = typeof document !== 'undefined' ? document.getElementById('audioPlayer') : null;
+const statusDiv = typeof document !== 'undefined' ? document.getElementById('status') : null;
+const loadBtn = typeof document !== 'undefined' ? document.getElementById('loadBtn') : null;
+const reconnectBtn = typeof document !== 'undefined' ? document.getElementById('reconnectBtn') : null;
+const debugToggleBtn = typeof document !== 'undefined' ? document.getElementById('debugToggleBtn') : null;
+const urlToggleBtn = typeof document !== 'undefined' ? document.getElementById('urlToggleBtn') : null;
+const urlInputContainer = typeof document !== 'undefined' ? document.getElementById('urlInputContainer') : null;
+const urlInput = typeof document !== 'undefined' ? document.getElementById('urlInput') : null;
+const debugPanel = typeof document !== 'undefined' ? document.getElementById('debugPanel') : null;
+const debugContent = typeof document !== 'undefined' ? document.getElementById('debugContent') : null;
+const liveBadge = typeof document !== 'undefined' ? document.getElementById('liveBadge') : null;
+const nowPlayingInfo = typeof document !== 'undefined' ? document.getElementById('nowPlayingInfo') : null;
+const songHistory = typeof document !== 'undefined' ? document.getElementById('songHistory') : null;
+const albumArt = typeof document !== 'undefined' ? document.getElementById('albumArt') : null;
+const playPauseButton = typeof document !== 'undefined' ? document.getElementById('playPauseButton') : null;
+const playIcon = typeof document !== 'undefined' ? document.getElementById('playIcon') : null;
+const pauseIcon = typeof document !== 'undefined' ? document.getElementById('pauseIcon') : null;
+const volumeSlider2 = typeof document !== 'undefined' ? document.getElementById('volumeSlider2') : null;
+const volumeButton = typeof document !== 'undefined' ? document.getElementById('volumeButton') : null;
 
 let bufferingTimer = null;
 let currentStreamUrl = '';
@@ -33,6 +34,9 @@ function getTimestamp() {
 }
 
 function addDebugEntry(message, isError = false) {
+    // Skip if running in test environment without DOM
+    if (!debugContent || typeof document === 'undefined') return;
+
     const entry = document.createElement('div');
     entry.className = 'debug-entry' + (isError ? ' error' : '');
     entry.innerHTML = `
@@ -40,7 +44,7 @@ function addDebugEntry(message, isError = false) {
     `;
     debugContent.appendChild(entry);
     // Only scroll if panel is already visible
-    if (debugPanel.classList.contains('visible')) {
+    if (debugPanel && debugPanel.classList.contains('visible')) {
         debugPanel.scrollTop = debugPanel.scrollHeight;
     }
 }
@@ -149,6 +153,8 @@ function getTrackKey(artist, title) {
 }
 
 function saveRating(artist, title, rating) {
+    // Always read from localStorage to ensure fresh data (important for tests)
+    const trackRatings = JSON.parse(localStorage.getItem('trackRatings') || '{}');
     const key = getTrackKey(artist, title);
     trackRatings[key] = rating;
     localStorage.setItem('trackRatings', JSON.stringify(trackRatings));
@@ -156,6 +162,8 @@ function saveRating(artist, title, rating) {
 }
 
 function loadRating(artist, title) {
+    // Always read from localStorage to ensure fresh data (important for tests)
+    const trackRatings = JSON.parse(localStorage.getItem('trackRatings') || '{}');
     const key = getTrackKey(artist, title);
     return trackRatings[key] || 0;
 }
@@ -316,6 +324,8 @@ function loadStream(streamUrl) {
     });
 }
 
+// Only run initialization code if all DOM elements are available (not in tests)
+if (loadBtn && urlInput && audio) {
 loadBtn.addEventListener('click', () => {
     loadStream(urlInput.value);
 });
@@ -541,3 +551,14 @@ fetch('/config')
         addDebugEntry(`Fallback to last used URL from storage`);
         loadStream(lastUrl);
     });
+} // End of DOM elements check
+
+// Export functions for testing (only in Node.js environment)
+if (typeof module !== 'undefined' && module.exports) {
+    module.exports = {
+        getTrackKey,
+        saveRating,
+        loadRating,
+        updateStarDisplay
+    };
+}

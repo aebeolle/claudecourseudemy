@@ -32,3 +32,6 @@ logs/
 # Downloaded HTML (reference file)
 Free Hi-Res Internet Radio - Radio Calico.html
 Free Hi-Res Internet Radio - Radio Calico_files/
+
+# Test coverage
+coverage/

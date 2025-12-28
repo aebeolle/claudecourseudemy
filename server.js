@@ -185,6 +185,12 @@ app.get('/metadata', (req, res) => {
     });
 });
 
-app.listen(PORT, () => {
-  console.log(`Radio player running at http://localhost:${PORT}`);
-});
+// Only start server if run directly (not when imported for testing)
+if (require.main === module) {
+  app.listen(PORT, () => {
+    console.log(`Radio player running at http://localhost:${PORT}`);
+  });
+}
+
+// Export app for testing
+module.exports = app;
