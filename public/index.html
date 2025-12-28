@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Radio Calico - Live Stream Player</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <!-- Site Header -->
+    <header class="site-header">
+        <div class="header-content">
+            <div class="site-logo">
+                <h1>📻 Radio Calico</h1>
+            </div>
+            <nav class="site-nav">
+                <a href="#player">Listen Live</a>
+                <a href="#about">About</a>
+                <a href="https://www.radio-calico.com" target="_blank">Visit Site</a>
+            </nav>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="main-content">
+        <!-- Hero Section -->
+        <section class="hero-section">
+            <h2>Radio Calico: Hi-Res Music Across Genres and Time</h2>
+            <p>100% ad-free all day. No subscriptions, no tracking.</p>
+            <p style="font-size: 0.95em; margin-top: 10px;">Ad-free online radio with lossless, high-definition streaming at 48kHz / 24-bit fidelity</p>
+            <p style="font-size: 0.85em; color: #999; margin-top: 15px;">Some songs may contain explicit lyrics.</p>
+            <div style="margin-top: 20px; font-size: 0.9em;">
+                <p>Or <a href="https://tunein.com/radio/Radio-Calico-s321119/" target="_blank" rel="noopener" style="color: #4a9594; text-decoration: none;">Listen on TuneIn</a> or <a href="http://audiophile.fm/radio-calico" target="_blank" rel="noopener" style="color: #4a9594; text-decoration: none;">audiophile.fm</a></p>
+            </div>
+        </section>
+
+        <!-- Player Container -->
+        <div class="player-container" id="player">
+            <div class="header-row">
+                <span id="liveBadge" class="live-badge">● LIVE</span>
+            </div>
+
+        <div style="margin: 20px 0;">
+            <button id="urlToggleBtn" class="url-toggle-btn">Change Stream URL</button>
+        </div>
+
+        <div id="urlInputContainer" class="url-input-container">
+            <input
+                type="text"
+                id="urlInput"
+                class="url-input"
+                placeholder="Enter MP3 radio stream URL"
+            />
+            <button id="loadBtn" class="load-btn">Load Stream</button>
+        </div>
+
+        <div class="audio-controls">
+            <audio id="audioPlayer"></audio>
+            <div class="player-controls">
+                <div class="control-wrapper">
+                    <button id="playPauseButton" class="control-btn" title="Play">
+                        <svg id="playIcon" width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
+                            <path d="M8 5v14l11-7z"/>
+                        </svg>
+                        <svg id="pauseIcon" width="24" height="24" viewBox="0 0 24 24" fill="currentColor" style="display: none;">
+                            <path d="M6 4h4v16H6V4zm8 0h4v16h-4V4z"/>
+                        </svg>
+                    </button>
+                </div>
+                <div class="volume-control">
+                    <div class="volume-inner">
+                        <button id="volumeButton" class="control-btn volume-btn" title="Volume">
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
+                                <path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02z"/>
+                            </svg>
+                        </button>
+                        <input type="range" id="volumeSlider2" class="volume-slider2" min="0" max="100" value="80" />
+                    </div>
+                    <span class="control-label">🔊 Volume</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="metadata-section">
+            <div class="now-playing">
+                <h3>🎵 Now Playing</h3>
+                <div class="now-playing-content">
+                    <div class="album-art" id="albumArt">
+                        🎵
+                    </div>
+                    <div id="nowPlayingInfo" class="metadata-info">
+                        <div>
+                            <div class="metadata-label">Track</div>
+                            <div class="metadata-title">Waiting for track info...</div>
+                        </div>
+                        <div>
+                            <div class="metadata-label">Artist</div>
+                            <div class="metadata-artist">-</div>
+                        </div>
+                        <div class="rating-container">
+                            <div class="star-rating" id="starRating">
+                                <span class="star" data-rating="1">★</span>
+                                <span class="star" data-rating="2">★</span>
+                                <span class="star" data-rating="3">★</span>
+                                <span class="star" data-rating="4">★</span>
+                                <span class="star" data-rating="5">★</span>
+                            </div>
+                            <span class="rating-text" id="ratingText">Rate this track</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="song-history">
+                <h4>Recently Played</h4>
+                <div id="songHistory" class="history-list">
+                    <div class="history-empty">No history yet</div>
+                </div>
+            </div>
+        </div>
+
+        <div>
+            <button id="reconnectBtn" class="reconnect-btn">Reconnect</button>
+        </div>
+
+        <div id="status" class="status loading">Ready to load stream</div>
+
+        <div style="margin-top: 15px;">
+            <button id="debugToggleBtn" class="debug-toggle-btn">Show Debug Log</button>
+        </div>
+
+        <div id="debugPanel" class="debug-panel">
+            <h4>Debug Log</h4>
+            <div id="debugContent"></div>
+        </div>
+
+        <!-- Additional Info Section -->
+        <section class="info-section" style="margin-top: 60px; text-align: left; max-width: 800px; margin-left: auto; margin-right: auto;">
+            <div style="background: #484848; padding: 30px; border-radius: 15px;">
+                <h3 style="color: #d5efca; font-size: 1.4em; margin-bottom: 20px;">For External Players</h3>
+                <p style="color: #cbcbcb; line-height: 1.8; margin-bottom: 15px;">
+                    If you have an Internet radio player of your own, direct URLs for our streams are:
+                </p>
+                <div style="background: #626262; padding: 20px; border-radius: 10px; margin: 20px 0;">
+                    <p style="color: #d5efca; font-weight: 600; margin-bottom: 10px;">Lossless 48kHz / 24-bit FLAC (best quality):</p>
+                    <p style="color: #f9f9fb; font-size: 0.9em; margin: 8px 0; font-family: monospace;">
+                        <a href="https://radio3.radio-calico.com:8443/calico" style="color: #4a9594; text-decoration: none;">https://radio3.radio-calico.com:8443/calico</a>
+                    </p>
+                    <p style="color: #d5efca; font-weight: 600; margin: 20px 0 10px 0;">MP3 320kbps (universal compatibility):</p>
+                    <p style="color: #f9f9fb; font-size: 0.9em; margin: 8px 0; font-family: monospace;">
+                        <a href="https://radio3.radio-calico.com:8443/calico.mp3" style="color: #4a9594; text-decoration: none;">https://radio3.radio-calico.com:8443/calico.mp3</a>
+                    </p>
+                </div>
+                <p style="color: #cbcbcb; line-height: 1.8; margin-top: 20px;">
+                    Check out our apps! Or <a href="https://tunein.com/radio/Radio-Calico-s321119/" target="_blank" rel="noopener" style="color: #4a9594; text-decoration: none;">listen on TuneIn</a> or <a href="http://audiophile.fm/radio-calico" target="_blank" rel="noopener" style="color: #4a9594; text-decoration: none;">audiophile.fm</a>
+                </p>
+            </div>
+        </section>
+    </div>
+
+    <script src="script.js"></script>
+
+    </main>
+
+    <!-- Site Footer -->
+    <footer class="site-footer" id="about">
+        <div class="footer-content">
+            <p><strong>Radio Calico</strong> - Ad-free online radio with lossless, high-definition streaming</p>
+            <p>48kHz / 24-bit fidelity • Live streaming 24/7</p>
+            <div class="footer-links">
+                <a href="https://www.radio-calico.com" target="_blank">Official Website</a>
+                <a href="#player">Listen Live</a>
+                <a href="mailto:info@radio-calico.com">Contact</a>
+            </div>
+            <p style="margin-top: 20px; font-size: 0.85em; color: #999;">&copy; 2025 Radio Calico. All rights reserved.</p>
+        </div>
+    </footer>
+</body>
+</html>

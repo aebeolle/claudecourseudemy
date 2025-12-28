@@ -1,0 +1,15 @@
+{
+  "name": "radiocalico",
+  "version": "1.0.0",
+  "description": "Simple HLS radio player",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "dependencies": {
+    "express": "^4.18.2"
+  },
+  "keywords": ["hls", "radio", "player"],
+  "author": "",
+  "license": "ISC"
+}
