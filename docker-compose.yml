@@ -1,0 +1,72 @@
+version: '3.8'
+
+services:
+  # ============================================
+  # Development Service
+  # ============================================
+  radiocalico-dev:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: development
+    container_name: radiocalico-dev
+    ports:
+      - "3000:3000"
+    environment:
+      - NODE_ENV=development
+      - PORT=3000
+      - STREAM_URL=${STREAM_URL:-https://radio3.radio-calico.com:8443/calico.mp3}
+    volumes:
+      # Mount source code for hot-reloading
+      - ./server.js:/app/server.js
+      - ./public:/app/public
+      - ./stream_URL.txt:/app/stream_URL.txt
+      # Prevent node_modules from being overwritten
+      - /app/node_modules
+    restart: unless-stopped
+    networks:
+      - radiocalico-network
+    healthcheck:
+      test: ["CMD", "node", "-e", "require('http').get('http://localhost:3000/config', (r) => {process.exit(r.statusCode === 200 ? 0 : 1)})"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 10s
+
+  # ============================================
+  # Production Service
+  # ============================================
+  radiocalico-prod:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: production
+    container_name: radiocalico-prod
+    ports:
+      - "3001:3000"
+    environment:
+      - NODE_ENV=production
+      - PORT=3000
+      - STREAM_URL=${STREAM_URL:-https://radio3.radio-calico.com:8443/calico.mp3}
+    restart: unless-stopped
+    networks:
+      - radiocalico-network
+    healthcheck:
+      test: ["CMD", "node", "-e", "require('http').get('http://localhost:3000/config', (r) => {process.exit(r.statusCode === 200 ? 0 : 1)})"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 10s
+    # Resource limits for production
+    deploy:
+      resources:
+        limits:
+          cpus: '0.5'
+          memory: 512M
+        reservations:
+          cpus: '0.25'
+          memory: 256M
+
+networks:
+  radiocalico-network:
+    driver: bridge
